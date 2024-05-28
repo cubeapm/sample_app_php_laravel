@@ -1,0 +1,24 @@
+version: "3"
+services:
+  laravel:
+    build:
+      context: .
+    container_name: cube_php_laravel_laravel
+    environment:
+      - OTEL_PHP_AUTOLOAD_ENABLED=true
+      - OTEL_METRICS_EXPORTER=none
+      - OTEL_LOGS_EXPORTER=none
+      - OTEL_EXPORTER_OTLP_COMPRESSION=gzip
+      - OTEL_PROPAGATORS=baggage,tracecontext
+      - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
+
+      - OTEL_SERVICE_NAME=cube_sample_php_laravel
+
+      # print traces on console
+      - OTEL_TRACES_EXPORTER=console
+      # send traces to CubeAPM
+      # - OTEL_TRACES_EXPORTER=otlp
+      # - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://host.docker.internal:4318/v1/traces
+    ports:
+      - "8000:8000"
+    restart: always
