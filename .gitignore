@@ -1,2 +1,3 @@
 # when updating this file, also consider updating .dockerignore
 .DS_Store
+composer.lock
