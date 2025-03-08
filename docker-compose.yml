@@ -1,0 +1,11 @@
+version: "3"
+services:
+  laravel:
+    platform: linux/amd64
+    build:
+      context: .
+      # dockerfile: Dockerfile
+    container_name: cube_php_laravel_laravel
+    ports:
+      - "8000:80"
+    restart: always
