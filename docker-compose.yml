@@ -8,4 +8,31 @@ services:
     container_name: cube_php_laravel_laravel
     ports:
       - "8000:80"
+    depends_on:
+      - mysql
     restart: always
+
+  laravel_worker:
+    platform: linux/amd64
+    build:
+      context: .
+      # dockerfile: Dockerfile
+    command: ["php", "artisan", "queue:work"]
+    container_name: cube_php_laravel_laravel_worker
+    depends_on:
+      - mysql
+    restart: always
+
+  mysql:
+    image: mysql:8.0
+    container_name: cube_php_laravel_mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=test
+    volumes:
+      - cube_php_laravel_mysql:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+volumes:
+  cube_php_laravel_mysql:

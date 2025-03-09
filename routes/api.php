@@ -13,3 +13,4 @@ Route::get('/param/{param}', [ApiController::class, 'param']);
 Route::get('/exception', [ApiController::class, 'exception']);
 Route::get('/api/{status}', [ApiController::class, 'api']);
 Route::get('/status/{status}', [ApiController::class, 'status']);
+Route::get('/job', [ApiController::class, 'job']);
