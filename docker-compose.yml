@@ -20,6 +20,9 @@ services:
     build:
       context: .
       # dockerfile: Dockerfile
+      args:
+        # New Relic agent will send data on https://<domain_of_cubeapm_server>:443
+        NEW_RELIC_HOST: <domain_of_cubeapm_server>
     command: ["php", "artisan", "queue:work"]
     container_name: cube_php_laravel_laravel_worker
     depends_on:
