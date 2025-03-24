@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use App\Jobs\SampleJob;
 
 class ApiController extends Controller
@@ -47,4 +49,17 @@ class ApiController extends Controller
 
         return response()->json(['message' => 'Job scheduled!']);
     }
+
+    public function redis(Request $request)
+    {
+        Cache::put('foo', 'bar', 600);
+        return response()->json(['message' => 'Redis called']);
+    }
+
+    public function mysql()
+    {
+        $data = DB::select('SELECT * FROM user');
+        return response()->json($data);
+    }
+
 }

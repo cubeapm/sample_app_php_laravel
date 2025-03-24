@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y vim curl
 # Install PHP
 RUN apt-get update && apt-get install -y software-properties-common
 RUN apt-add-repository ppa:ondrej/php -y
-RUN apt-get update && apt-get install -y --no-install-recommends unzip nginx php8.3 php8.3-cli php8.3-common php8.3-zip php8.3-mbstring php8.3-curl php8.3-xml php8.3-mysql php8.3-sqlite3 php8.3-fpm ca-certificates
+RUN apt-get update && apt-get install -y --no-install-recommends unzip nginx php8.3 php8.3-cli php8.3-common php8.3-zip php8.3-mbstring php8.3-curl php8.3-xml php8.3-mysql php8.3-redis php8.3-sqlite3 php8.3-fpm ca-certificates
 
 # php8.3-fpm needs this directory but doesn't create it
 RUN mkdir /run/php
@@ -27,6 +27,8 @@ ADD nginx/default /etc/nginx/sites-available/default
 WORKDIR /sample_php_laravel
 
 ADD . .
+
+RUN composer install
 
 RUN chown -R www-data:www-data .
 
