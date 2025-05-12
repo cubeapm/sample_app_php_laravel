@@ -13,6 +13,7 @@ services:
       - "8000:80"
     depends_on:
       - mysql
+      - redis
     restart: always
 
   laravel_worker:
@@ -39,6 +40,11 @@ services:
       - cube_php_laravel_mysql:/var/lib/mysql
     ports:
       - "3306:3306"
+
+    
+  redis:
+    image: redis:alpine3.18
+    container_name: cube_php_laravel_redis
 
 volumes:
   cube_php_laravel_mysql:
