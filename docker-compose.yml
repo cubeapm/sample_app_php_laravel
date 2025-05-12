@@ -6,8 +6,20 @@ services:
       context: .
       # dockerfile: Dockerfile
     container_name: cube_php_laravel_laravel
+    environment:
+      - OTEL_SERVICE_NAME=cube_sample_php_laravel_otel
+      - OTEL_EXPORTER_OTLP_COMPRESSION=gzip 
+      - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
+      - OTEL_TRACES_EXPORTER=otlp
+
+      # print traces on console
+      - OTEL_LOG_LEVEL=debug
+      # send traces to CubeAPM
+      # - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://host.docker.internal:4318/v1/traces 
+      - OTEL_PHP_AUTOLOAD_ENABLED=true 
+      - OTEL_PROPAGATORS=baggage,tracecontext 
     ports:
-      - "8000:80"
+      - "8000:8000"
     depends_on:
       - mysql
       - redis
@@ -20,6 +32,18 @@ services:
       # dockerfile: Dockerfile
     command: ["php", "artisan", "queue:work"]
     container_name: cube_php_laravel_laravel_worker
+    environment:
+      - OTEL_SERVICE_NAME=cube_sample_php_laravel_otel
+      - OTEL_EXPORTER_OTLP_COMPRESSION=gzip 
+      - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
+      - OTEL_TRACES_EXPORTER=otlp
+
+      # print traces on console
+      - OTEL_LOG_LEVEL=debug
+      # send traces to CubeAPM
+      # - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://host.docker.internal:4318/v1/traces 
+      - OTEL_PHP_AUTOLOAD_ENABLED=true 
+      - OTEL_PROPAGATORS=baggage,tracecontext 
     depends_on:
       - mysql
     restart: always
