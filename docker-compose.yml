@@ -19,7 +19,7 @@ services:
       - OTEL_PHP_AUTOLOAD_ENABLED=true 
       - OTEL_PROPAGATORS=baggage,tracecontext 
     ports:
-      - "8000:8000"
+      - "8000:80"
     depends_on:
       - mysql
       - redis
