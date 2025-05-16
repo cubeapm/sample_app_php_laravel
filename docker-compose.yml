@@ -35,7 +35,6 @@ services:
     ports:
       - "3306:3306"
 
-    
   redis:
     image: redis:alpine3.18
     container_name: cube_php_laravel_redis
