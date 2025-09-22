@@ -8,13 +8,11 @@ Refer the project README below for more details.
 
 ## Troubleshooting
 
-If the app does not show up in CubeAPM after integration is done, add the below environment variables to check Elastic agent logs.
+If the app does not show up in CubeAPM after integration is done, add the below configuration to check Elastic agent logs.
 
 ```shell
-# Print Elastic agent logs on screen
-ELASTIC_APM_LOG_FILE=stdout
 # Set Elastic agent log level to debug if needed to see detailed logs
-#ELASTIC_APM_LOG_LEVEL=debug
+#elastic_apm.log_level=debug
 ```
 
 ---
