@@ -25,6 +25,18 @@ RUN curl -LO https://github.com/DataDog/dd-trace-php/releases/latest/download/da
   && php datadog-setup.php --php-bin php-fpm8.3 \
   && rm datadog-setup.php
 
+# Configure PHP-FPM pool to use Datadog INI values
+RUN echo "\n\
+php_value[datadog.trace.agent_url] = http://host.docker.internal:3130\n\
+php_value[datadog.service]         = cube_sample_app_php_laravel_datadog\n\
+php_value[datadog.env]             = myenv\n\
+php_value[datadog.version]         = 1.2.3\n\
+php_value[datadog.tags]            = mykey1:myvalue1,mykey2:myvalue2\n\
+php_value[datadog.trace.log_file]  = "/var/log/php8.3-fpm.log"\n\
+php_value[datadog.trace.debug]     = 1\n\  
+php_value[datadog.trace.log_level] = debug\n"\
+>> /etc/php/8.3/fpm/pool.d/www.conf
+
 # update nginx config
 ADD nginx/default /etc/nginx/sites-available/default
 
