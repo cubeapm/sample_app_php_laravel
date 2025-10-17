@@ -25,17 +25,23 @@ RUN curl -LO https://github.com/DataDog/dd-trace-php/releases/latest/download/da
   && php datadog-setup.php --php-bin php-fpm8.3 \
   && rm datadog-setup.php
 
-# Configure PHP-FPM pool to use Datadog INI values
-RUN echo "\n\
-php_value[datadog.trace.agent_url] = http://host.docker.internal:3130\n\
-php_value[datadog.service]         = cube_sample_app_php_laravel_datadog\n\
-php_value[datadog.env]             = myenv\n\
-php_value[datadog.version]         = 1.2.3\n\
-php_value[datadog.tags]            = mykey1:myvalue1,mykey2:myvalue2\n\
-php_value[datadog.trace.log_file]  = "/var/log/php8.3-fpm.log"\n\
-php_value[datadog.trace.debug]     = 1\n\  
-php_value[datadog.trace.log_level] = debug\n"\
->> /etc/php/8.3/fpm/pool.d/www.conf
+# Configure Datadog tracer values in existing INI
+RUN sed -i \
+    -e "s|^;datadog.trace.agent_url.*|datadog.trace.agent_url = http://host.docker.internal:3130|" \
+    -e "s|^;datadog.service.*|datadog.service = cube_sample_app_php_laravel_datadog|" \
+    -e "s|^;datadog.env.*|datadog.env = myenv|" \
+    -e "s|^;datadog.version.*|datadog.version = 1.2.3|" \
+    -e "s|^;datadog.tags.*|datadog.tags = mykey1:myvalue1,mykey2:myvalue2|" \
+# ; When enabled, sends debug logs to PHP's error_log instead of datadog.trace.log_file
+    -e "s|^;datadog.trace.debug.*|datadog.trace.debug = On|" \
+# Enable Datadog tracer debug logging if needed to see detailed log 
+    -e "s|^;datadog.trace.log_level.*|datadog.trace.log_level = debug|" \
+    /etc/php/8.3/cli/conf.d/98-ddtrace.ini \
+ && grep -q "datadog.trace.log_file" /etc/php/8.3/cli/conf.d/98-ddtrace.ini || \
+    echo 'datadog.trace.log_file = /var/log/php8.3-fpm.log' >> /etc/php/8.3/cli/conf.d/98-ddtrace.ini
+
+# Copy the updated INI for FPM as well
+RUN cp /etc/php/8.3/cli/conf.d/98-ddtrace.ini /etc/php/8.3/fpm/conf.d/98-ddtrace.ini
 
 # update nginx config
 ADD nginx/default /etc/nginx/sites-available/default
