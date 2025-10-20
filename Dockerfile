@@ -2,6 +2,8 @@ FROM ubuntu:22.04
 
 ARG DEBIAN_FRONTEND=noninteractive
 
+ARG DD_TRACE_AGENT_URL=""
+
 # For dev
 RUN apt-get update && apt-get install -y vim curl
 
@@ -19,19 +21,18 @@ RUN php composer-setup.php
 RUN php -r "unlink('composer-setup.php');"
 RUN mv composer.phar /usr/local/bin/composer
 
-# Download and install the Datadog PHP tracer (inside container)
+# install Datadog PHP tracer
 RUN curl -LO https://github.com/DataDog/dd-trace-php/releases/latest/download/datadog-setup.php \
-  && php datadog-setup.php --php-bin php8.3 \
-  && php datadog-setup.php --php-bin php-fpm8.3 \
+  && php datadog-setup.php --php-bin=all \
   && rm datadog-setup.php
 
-# Configure Datadog tracer values in existing INI
+# update datadog config
 RUN sed -i \
-    -e "s|^;datadog.trace.agent_url.*|datadog.trace.agent_url = http://host.docker.internal:3130|" \
+    -e "s|^;datadog.trace.agent_url.*|datadog.trace.agent_url = $DD_TRACE_AGENT_URL|" \
     -e "s|^;datadog.service.*|datadog.service = cube_sample_app_php_laravel_datadog|" \
-    -e "s|^;datadog.env.*|datadog.env = myenv|" \
-    -e "s|^;datadog.version.*|datadog.version = 1.2.3|" \
-    -e "s|^;datadog.tags.*|datadog.tags = mykey1:myvalue1,mykey2:myvalue2|" \
+    # -e "s|^;datadog.env.*|datadog.env = myenv|" \
+    # -e "s|^;datadog.version.*|datadog.version = 1.2.3|" \
+    # -e "s|^;datadog.tags.*|datadog.tags = mykey1:myvalue1,mykey2:myvalue2|" \
 # ; When enabled, sends debug logs to PHP's error_log instead of datadog.trace.log_file
     -e "s|^;datadog.trace.debug.*|datadog.trace.debug = On|" \
 # Enable Datadog tracer debug logging if needed to see detailed log 
