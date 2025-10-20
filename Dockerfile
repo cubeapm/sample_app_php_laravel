@@ -2,6 +2,7 @@ FROM ubuntu:22.04
 
 ARG DEBIAN_FRONTEND=noninteractive
 
+ARG QUEUE_WORKER=false
 ARG NEW_RELIC_HOST=""
 
 # For dev
@@ -34,8 +35,10 @@ RUN sed -i "s/;newrelic.daemon.collector_host = \"\"/newrelic.daemon.collector_h
 # NOTE: below timeout values need to be set for queue worker,
 # but these values impact web worker performance negatively,
 # so they should not be set for web workers in production.
-RUN sed -i 's/;newrelic.daemon.app_connect_timeout = 0/newrelic.daemon.app_connect_timeout = "15s"/g' /etc/php/8.3/mods-available/newrelic.ini
-RUN sed -i 's/;newrelic.daemon.start_timeout = 0/newrelic.daemon.start_timeout = "5s"/g' /etc/php/8.3/mods-available/newrelic.ini
+RUN if [ "$QUEUE_WORKER" = "true" ]; then \
+    sed -i 's/;newrelic.daemon.app_connect_timeout = 0/newrelic.daemon.app_connect_timeout = "15s"/g' /etc/php/8.3/mods-available/newrelic.ini; \
+    sed -i 's/;newrelic.daemon.start_timeout = 0/newrelic.daemon.start_timeout = "5s"/g' /etc/php/8.3/mods-available/newrelic.ini; \
+fi
 # remove irrelevant spans from traces (optional but highly recommended)
 RUN sed -i 's/;newrelic.transaction_tracer.detail = 1/newrelic.transaction_tracer.detail = 0/g' /etc/php/8.3/mods-available/newrelic.ini
 # set newrelic agent and daemon log level to debug (for troubleshooting if needed)

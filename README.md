@@ -10,7 +10,7 @@ Refer the project README below for more details.
 
 ## Troubleshooting
 
-If the app does not show up in CubeAPM after integration is done, add the below environment variables to check New Relic agent logs(the config file is generally available at /etc/php/<php_version>/mods-available/newrelic.ini).
+If the app does not show up in CubeAPM after integration is done, add the below settings to check New Relic agent logs(the config file is generally available at /etc/php/<php_version>/mods-available/newrelic.ini).
 
 ```shell
 newrelic.loglevel = "debug"

@@ -22,6 +22,7 @@ services:
       context: .
       # dockerfile: Dockerfile
       args:
+        QUEUE_WORKER: "true"
         # New Relic agent will send data on https://<domain_of_cubeapm_server>:443
         NEW_RELIC_HOST: <domain_of_cubeapm_server>
     command: ["php", "artisan", "queue:work"]
