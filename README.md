@@ -2,7 +2,7 @@
 
 This branch contains code for Elastic instrumentation.
 
-By default, hitting an API endpoint will generate a trace, which is sent to CubeAPM. This behavior is controlled via environment variables in [docker-compose.yml](docker-compose.yml).
+By default, hitting an API endpoint will generate a trace, which is sent to CubeAPM. This behavior is controlled via settings in [docker-compose.yml](docker-compose.yml) and [Dockerfile](Dockerfile).
 
 Refer the project README below for more details.
 
