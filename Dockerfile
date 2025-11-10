@@ -28,12 +28,33 @@ WORKDIR /sample_php_laravel
 
 ADD . .
 
-# Install required PHP extensions using pecl 
-RUN pecl install opentelemetry protobuf && \
-    echo "extension=opentelemetry.so" > /etc/php/8.3/cli/conf.d/20-opentelemetry.ini && \
-    echo "extension=protobuf.so" > /etc/php/8.3/cli/conf.d/20-protobuf.ini && \
-    echo "extension=opentelemetry.so" > /etc/php/8.3/fpm/conf.d/20-opentelemetry.ini && \
-    echo "extension=protobuf.so" > /etc/php/8.3/fpm/conf.d/20-protobuf.ini
+# Install PECL + enable extensions
+RUN pecl install opentelemetry protobuf \
+ && echo "extension=opentelemetry.so" > /etc/php/8.3/fpm/conf.d/20-opentelemetry.ini \
+ && echo "extension=protobuf.so" > /etc/php/8.3/fpm/conf.d/20-protobuf.ini \
+ && echo "extension=opentelemetry.so" > /etc/php/8.3/cli/conf.d/20-opentelemetry.ini \
+ && echo "extension=protobuf.so" > /etc/php/8.3/cli/conf.d/20-protobuf.ini
+
+# FOR FPM
+# enable FPM stdout capture
+RUN sed -i 's/;catch_workers_output = .*/catch_workers_output = yes/' /etc/php/8.3/fpm/pool.d/www.conf
+
+# Append OTEL ENV
+RUN { \
+    echo 'env[OTEL_SERVICE_NAME] = "cube_sample_php_laravel_otel"'; \
+    echo 'env[OTEL_EXPORTER_OTLP_COMPRESSION] = "gzip"'; \
+    echo 'env[OTEL_EXPORTER_OTLP_PROTOCOL] = "http/protobuf"'; \
+    echo 'env[OTEL_PHP_AUTOLOAD_ENABLED] = "true"'; \
+    echo 'env[OTEL_PROPAGATORS] = "baggage,tracecontext"'; \
+    # print traces to this file location /var/log/php8.3-fpm.log
+    echo 'env[OTEL_TRACES_EXPORTER] = "console"'; \
+    echo 'env[OTEL_LOG_LEVEL] = "debug"'; \
+    # example for sending traces to CubeAPM OTLP collector
+    # echo 'env[OTEL_EXPORTER_OTLP_TRACES_ENDPOINT] = "http://host.docker.internal:4318/v1/traces"'; \
+ } >> /etc/php/8.3/fpm/pool.d/www.conf
+
+# FOR CLI
+# Use Environment variables (in docker-compose.yml)
 
 # Disable composer plugin security warnings
 RUN composer config allow-plugins.php-http/discovery false
